@@ -3,7 +3,7 @@ package muuid
 import "testing"
 
 func TestOsxUUID(t *testing.T) {
-	uuid, err := osxUUID()
+	uuid, err := linuxUUID()
 	if err != nil {
 		t.Fatal(err)
 	}

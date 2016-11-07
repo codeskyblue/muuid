@@ -8,6 +8,8 @@ import (
 	"regexp"
 	"runtime"
 	"strings"
+
+	"github.com/twinj/uuid"
 )
 
 var (
@@ -21,6 +23,8 @@ func UUID() string {
 	switch runtime.GOOS {
 	case "darwin":
 		uuid, err = osxUUID()
+	case "linux":
+		uuid, err = linuxUUID()
 	}
 	if err != nil || uuid == "" {
 		uuid = defaultUuid()
@@ -47,7 +51,11 @@ func linuxUUID() (string, error) {
 	if err != nil {
 		return "", ErrUuidNotFound
 	}
-	return "", nil
+	id := strings.TrimSpace(string(data))
+	if len(id) > 20 {
+		return id[0:8] + "-" + id[8:12] + "-" + id[12:16] + "-" + id[16:20] + "-" + id[20:], nil
+	}
+	return "", ErrUuidNotFound
 }
 
 func defaultUuid() string {
