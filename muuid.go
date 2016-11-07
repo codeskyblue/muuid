@@ -9,7 +9,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/twinj/uuid"
+	"github.com/satori/go.uuid"
 )
 
 var (
@@ -25,6 +25,8 @@ func UUID() string {
 		uuid, err = osxUUID()
 	case "linux":
 		uuid, err = linuxUUID()
+	case "windows":
+		uuid, err = winUUID()
 	}
 	if err != nil || uuid == "" {
 		uuid = defaultUuid()
@@ -56,6 +58,17 @@ func linuxUUID() (string, error) {
 		return id[0:8] + "-" + id[8:12] + "-" + id[12:16] + "-" + id[16:20] + "-" + id[20:], nil
 	}
 	return "", ErrUuidNotFound
+}
+
+func winUUID() (string, error) {
+	c := exec.Command("wmic", "CsProduct", "Get", "UUID")
+	output, err := c.Output()
+	if err != nil {
+		return "", err
+	}
+	pattern := regexp.MustCompile(`([\w\d]+)-([\w\d]+)-([\w\d]+)-([\w\d]+)-([\w\d]+)`)
+	s := pattern.FindString(string(output))
+	return s, nil
 }
 
 func defaultUuid() string {

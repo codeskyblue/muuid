@@ -3,9 +3,9 @@ package muuid
 import "testing"
 
 func TestOsxUUID(t *testing.T) {
-	uuid, err := linuxUUID()
-	if err != nil {
-		t.Fatal(err)
+	uuid := UUID()
+	if uuid == "" {
+		t.Fatal("got empty uuid string")
 	}
 	t.Log(uuid)
 }
