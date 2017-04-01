@@ -1,11 +1,17 @@
 package muuid
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 func TestOsxUUID(t *testing.T) {
-	uuid := UUID()
-	if uuid == "" {
+	u1 := UUIDFromOS("any")
+	if u1 == "" {
 		t.Fatal("got empty uuid string")
 	}
-	t.Log(uuid)
+	u2 := UUIDFromOS("any")
+	assert.Equal(t, u1, u2, "The two uuid should be equal")
+	RemoveTempUidFile()
 }

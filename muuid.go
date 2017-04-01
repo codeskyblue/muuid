@@ -4,7 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"regexp"
 	"runtime"
 	"strings"
@@ -17,10 +19,14 @@ var (
 )
 
 func UUID() string {
+	return UUIDFromOS(runtime.GOOS)
+}
+
+func UUIDFromOS(osName string) string {
 	var uuid string
 	var err error
 
-	switch runtime.GOOS {
+	switch osName {
 	case "darwin":
 		uuid, err = osxUUID()
 	case "linux":
@@ -71,8 +77,16 @@ func winUUID() (string, error) {
 	return s, nil
 }
 
+func getMachineUidPath() string {
+	homeDir := os.Getenv("HOME")
+	if homeDir == "" {
+		homeDir = "."
+	}
+	return filepath.Join(homeDir, ".muid")
+}
+
 func defaultUuid() string {
-	filePath := ".muid"
+	filePath := getMachineUidPath()
 	id := ""
 	data, err := ioutil.ReadFile(filePath)
 	if err != nil || strings.TrimSpace(string(data)) == "" {
@@ -82,4 +96,8 @@ func defaultUuid() string {
 		return strings.TrimSpace(string(data))
 	}
 	return id
+}
+
+func RemoveTempUidFile() error {
+	return os.Remove(getMachineUidPath())
 }
